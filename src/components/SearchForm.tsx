@@ -1,6 +1,5 @@
 import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col } from "react-bootstrap";
 
-
 interface SearchFormProps {
     ageRange: { min: number; max: number };
     hornLengthRange: { min: number; max: number };
@@ -18,10 +17,8 @@ function SearchForm({
     onSearch,
     onAgeRangeChange,
     onHornLengthRangeChange,
-    onGenderChange }: SearchFormProps) {
-
-
-
+    onGenderChange
+}: SearchFormProps) {
     return (
         <>
             <Form>
@@ -71,7 +68,7 @@ function SearchForm({
                                         onChange={(e) => onHornLengthRangeChange(parseInt(e.target.value), hornLengthRange.max)}
                                         style={{ width: '100%' }}
                                     >
-                                        {Array.from({ length: 16 }, (_, i) => i + 18).map(length => (
+                                        {Array.from({ length: 24 }, (_, i) => i + 10).map(length => (
                                             <option key={length} value={length}>{length} cm</option>
                                         ))}
                                     </FormControl>
@@ -86,7 +83,7 @@ function SearchForm({
                                         onChange={(e) => onHornLengthRangeChange(hornLengthRange.min, parseInt(e.target.value))}
                                         style={{ width: '100%' }}
                                     >
-                                        {Array.from({ length: 16 }, (_, i) => i + 18).map(length => (
+                                        {Array.from({ length: 24 }, (_, i) => i + 10).map(length => (
                                             <option key={length} value={length}>{length} cm</option>
                                         ))}
                                     </FormControl>
@@ -103,9 +100,9 @@ function SearchForm({
                                 onChange={(e) => onGenderChange(e.target.value)}
                                 style={{ width: '100%' }}
                             >
-                                <option value="">Alle</option>
-                                <option value="male">Männlich</option>
-                                <option value="female">Weiblich</option>
+                                <option value="null">Alle</option>
+                                <option value="1">Männlich</option>
+                                <option value="2">Weiblich</option>
                             </FormControl>
                         </FormGroup>
                     </Col>
@@ -114,9 +111,8 @@ function SearchForm({
                     </Col>
                 </Row>
             </Form>
-
         </>
-    )
+    );
 }
 
 export default SearchForm;
