@@ -1,10 +1,12 @@
-import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { useQuery, gql } from '@apollo/client';
 import ProfileCard from '../components/ProfileCard';
-import CardPlaceHolder from "../components/CardPlaceHolder";  // Corrected import name
+import CardPlaceHolder from "../components/CardPlaceHolder"; 
+import SearchForm from "../components/SearchForm";
 
-// Define the Profile type
+
+
 interface Profile {
     id: number;
     profilePhoto: { name: string };
@@ -17,7 +19,6 @@ interface Profile {
     lastseen: string;
 }
 
-// Define the response type for the query
 interface ProfilesData {
     profiles: Profile[];
 }
@@ -30,6 +31,18 @@ function Search() {
 
     const handleSearch = () => {
         // Handle the search logic here
+    };
+
+    const handleAgeRangeChange = (min: number, max: number) => {
+        setAgeRange({ min, max });
+    };
+
+    const handleHornLengthRangeChange = (min: number, max: number) => {
+        setHornLengthRange({ min, max });
+    };
+
+    const handleGenderChange = (selectedGender: string) => {
+        setGender(selectedGender);
     };
 
     const GET_PROFILES = gql`
@@ -47,9 +60,23 @@ function Search() {
             }
         }
     `;
+    //const { loading, error, data } = useQuery<ProfilesData>(GET_PROFILES);
 
-    // Use the useQuery hook with the correct types
-    const { loading, error, data } = useQuery<ProfilesData>(GET_PROFILES);
+    const { loading, error, data } = useQuery<ProfilesData>(GET_PROFILES,{
+        variables: {
+            ageRange: {
+                min: ageRange.min,
+                max: ageRange.max,
+            },
+            hornLengthRange: {
+                min: hornLengthRange.min,
+                max: hornLengthRange.max,
+            },
+            gender: gender,
+        },
+    });
+
+    if(error){return error.message}
 
 
     // useEffect hook to add delay
@@ -65,97 +92,15 @@ function Search() {
     return (
         <Container>
             <h2>Ich suche Einhörner</h2>
-            <Form>
-                <Row>
-                    <Col xs={12} md={6} lg={3}>
-                        <FormGroup>
-                            <FormLabel>Im Alter von</FormLabel>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <FormControl
-                                        as="select"
-                                        value={ageRange.min}
-                                        onChange={(e) => setAgeRange({ ...ageRange, min: parseInt(e.target.value) })}
-                                        style={{ width: '100%' }}
-                                    >
-                                        {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
-                                            <option key={age} value={age}>{age} Jahren</option>
-                                        ))}
-                                    </FormControl>
-                                </Col>
-                                <Col xs="auto" className="d-flex justify-content-center">
-                                    <div>bis</div>
-                                </Col>
-                                <Col>
-                                    <FormControl
-                                        as="select"
-                                        value={ageRange.max}
-                                        onChange={(e) => setAgeRange({ ...ageRange, max: parseInt(e.target.value) })}
-                                        style={{ width: '100%' }}
-                                    >
-                                        {Array.from({ length: 82 }, (_, i) => i + 18).map(age => (
-                                            <option key={age} value={age}>{age} Jahren</option>
-                                        ))}
-                                    </FormControl>
-                                </Col>
-                            </Row>
-                        </FormGroup>
-                    </Col>
-                    <Col xs={12} md={6} lg={3}>
-                        <FormGroup>
-                            <FormLabel>Mit einer Hornlänge von</FormLabel>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <FormControl
-                                        as="select"
-                                        value={hornLengthRange.min}
-                                        onChange={(e) => setHornLengthRange({ ...hornLengthRange, min: parseInt(e.target.value) })}
-                                        style={{ width: '100%' }}
-                                    >
-                                        {Array.from({ length: 16 }, (_, i) => i + 18).map(length => (
-                                            <option key={length} value={length}>{length} cm</option>
-                                        ))}
-                                    </FormControl>
-                                </Col>
-                                <Col xs="auto" className="d-flex justify-content-center">
-                                    <div>bis</div>
-                                </Col>
-                                <Col>
-                                    <FormControl
-                                        as="select"
-                                        value={hornLengthRange.max}
-                                        onChange={(e) => setHornLengthRange({ ...hornLengthRange, max: parseInt(e.target.value) })}
-                                        style={{ width: '100%' }}
-                                    >
-                                        {Array.from({ length: 16 }, (_, i) => i + 18).map(length => (
-                                            <option key={length} value={length}>{length} cm</option>
-                                        ))}
-                                    </FormControl>
-                                </Col>
-                            </Row>
-                        </FormGroup>
-                    </Col>
-                    <Col xs={12} md={6} lg={3}>
-                        <FormGroup>
-                            <FormLabel>Geschlecht</FormLabel>
-                            <FormControl
-                                as="select"
-                                value={gender}
-                                onChange={(e) => setGender(e.target.value)}
-                                style={{ width: '100%' }}
-                            >
-                                <option value="">Alle</option>
-                                <option value="male">Männlich</option>
-                                <option value="female">Weiblich</option>
-                                <option value="other">Andere</option>
-                            </FormControl>
-                        </FormGroup>
-                    </Col>
-                    <Col xs={12} md={6} lg={3} className="d-flex align-items-end">
-                        <Button onClick={handleSearch} variant="primary" className="w-100" style={{ maxWidth: '150px' }}>Suche starten</Button>
-                    </Col>
-                </Row>
-            </Form>
+            <SearchForm
+                ageRange={ageRange}
+                hornLengthRange={hornLengthRange}
+                gender={gender}
+                onSearch={handleSearch}
+                onAgeRangeChange={handleAgeRangeChange}
+                onHornLengthRangeChange={handleHornLengthRangeChange}
+                onGenderChange={handleGenderChange}
+            />
 
             <Row>
                 {loading || !showProfiles ? (
