@@ -10,7 +10,7 @@ export default class AgeToDateUtil {
 
         // Format the date as yyyy-mm-dd
         const formattedDate = `${birthdate.getFullYear()}-${(birthdate.getMonth() + 1).toString().padStart(2, '0')}-${birthdate.getDate().toString().padStart(2, '0')}`;
-
+        //console.log(formattedDate);
         return formattedDate;
     }
 }

@@ -55,7 +55,7 @@ const GET_PROFILES = gql`
 function Search() {
     const [searchCriteria, setSearchCriteria] = useState({
         ageRange: { min: 18, max: 99 },
-        hornLengthRange: { min: 10, max: 33 },
+        hornLengthRange: { min: 1, max: 33 },
         gender: 1,
     });
     const [showProfiles, setShowProfiles] = useState(false);
@@ -70,13 +70,21 @@ function Search() {
             attractedToGender: searchCriteria.gender,
             minHornLength: searchCriteria.hornLengthRange.min,
             maxHornLength: searchCriteria.hornLengthRange.max,
-            //minBirthdate: ageToDateString(searchCriteria.ageRange.min),
-            //maxBirthdate: ageToDateString(searchCriteria.ageRange.max),
+            /*
+                minBirthdate ist das frühestmögliche Geburtsdatum also ageRange.MAX
+                maxBirthdate bezieht sich das das späteste geburtsdatum.
+                minBirthDate ist das MAXIMAL Alter
+                maxBirthDate ist das MINIMAL Alter
+                ==> ageRange,MAX wird minBirthdate zugewiesen. Analog ageRange.MIN
+            */
+            minBirthdate: ageToDateString(searchCriteria.ageRange.max),
+            maxBirthdate: ageToDateString(searchCriteria.ageRange.min),
         }
     });
 
     useEffect(() => {
         if (!loading && data) {
+            console.log(data.profilesFilter);
             setShowProfiles(true);
         } else {
             setShowProfiles(false);
@@ -95,8 +103,8 @@ function Search() {
             attractedToGender: newCriteria.gender,
             minHornLength: newCriteria.hornLengthRange.min,
             maxHornLength: newCriteria.hornLengthRange.max,
-           // minBirthdate: ageToDateString(newCriteria.ageRange.min),
-            //maxBirthdate: ageToDateString(newCriteria.ageRange.max),
+            minBirthdate: ageToDateString(newCriteria.ageRange.max),
+            maxBirthdate: ageToDateString(newCriteria.ageRange.min),
         });
     };
 

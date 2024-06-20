@@ -86,7 +86,7 @@ function SearchForm({
                                     onChange={(e) => handleHornLengthRangeChange(parseInt(e.target.value), hornLengthRange.max)}
                                     style={{ width: '100%' }}
                                 >
-                                    {Array.from({ length: 24 }, (_, i) => i + 10).map(length => (
+                                    {Array.from({ length: 33 }, (_, i) => i + 1).map(length => (
                                         <option key={length} value={length}>{length} cm</option>
                                     ))}
                                 </FormControl>
@@ -101,7 +101,7 @@ function SearchForm({
                                     onChange={(e) => handleHornLengthRangeChange(hornLengthRange.min, parseInt(e.target.value))}
                                     style={{ width: '100%' }}
                                 >
-                                    {Array.from({ length: 24 }, (_, i) => i + 10).map(length => (
+                                    {Array.from({ length: 33 }, (_, i) => i + 1).map(length => (
                                         <option key={length} value={length}>{length} cm</option>
                                     ))}
                                 </FormControl>
