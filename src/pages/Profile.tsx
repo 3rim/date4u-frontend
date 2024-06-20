@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, FormGroup, FormLabel, FormControl } from 'react-bootstrap';
 import Carousel from 'react-bootstrap/Carousel';
 import { useParams } from 'react-router-dom';
