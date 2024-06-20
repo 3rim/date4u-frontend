@@ -1,16 +1,17 @@
 .custom-bg-primary {
     background-color: #333 !important;
 }
+
 .custom-bg-secondary {
-    background-color: #3333;
+    background-color: #333; /* Corrected the background color value */
 }
 
 .nav {
     overflow: hidden;
     background-color: #333;
     gap: 2rem;
-
 }
+
 .nav ul {
     list-style-type: none;
     display: flex;
@@ -23,12 +24,15 @@
 .nav a {
     text-decoration: none;
     color: white; /* Ensure the text is visible */
+    padding: 10px 15px; /* Added padding for better spacing */
+    display: block; /* Ensures the entire area is clickable */
+    font-size: 1.2rem; /* Increase font size */
 }
 
-.nav ul a.active{
+.nav a.active {
     background-color: #666;
 }
 
-.nav li:hover{
+.nav li:hover {
     background-color: #777;
 }

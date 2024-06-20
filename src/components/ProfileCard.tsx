@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import { useNavigate } from 'react-router-dom';
+
 
 interface Profile {
     id: number;
@@ -20,7 +22,13 @@ interface Props {
 
 function ProfileCard({ profile }: Props) {
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+    const navigate = useNavigate();
 
+    const handleGoToProfile = () => {
+        // Navigate to the profile page with the profile ID
+        navigate(`/profile/${profile.id}`);
+    };
+    
     //This hook updates the photoUrl state whenever the profile.profilePhoto?.name changes. 
     //This ensures that the component re-renders with the correct photo URL.
     useEffect(() => {
@@ -63,7 +71,7 @@ function ProfileCard({ profile }: Props) {
                 <Card.Text>
                     <small className="text-muted">Last seen: {profile.lastseen}</small>
                 </Card.Text>
-                <Button variant="primary">Go To Profile</Button>
+                <Button variant="primary" onClick={handleGoToProfile}>Go To Profile</Button>
             </Card.Body>
             
         </Card>

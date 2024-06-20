@@ -11,11 +11,12 @@ function App() {
     <>
       <div className=' '>
         <div className='custom-bg-primary'>
-          <h1 className='text-center text-white'>Dating U(nicorns)</h1>
+          <h1 className='text-center text-white pt-5'>Dating U(nicorns)</h1>
           <NavBar />
         </div>
         <Routes>
           <Route path="/" element={<Profile />} />
+          <Route path="/profile/:profileId" element={<Profile />} />
           <Route path="/search" element={<Search />} />
         </Routes>
         <Footer />

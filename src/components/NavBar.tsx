@@ -5,7 +5,8 @@ function NavBar() {
             <nav className="nav">
                 <ul className=''>
                     <li>
-                        <NavLink to="/">Profile</NavLink>
+                        {/*hardcoded "logged in" state. I am profile 1*/}
+                        <NavLink to="/profile/2">Profile</NavLink>
                     </li>
                     <li>
                         <NavLink to="/search">Suche</NavLink>
