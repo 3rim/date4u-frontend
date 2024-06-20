@@ -22,74 +22,59 @@ interface ProfilesData {
     profilesFilter: Profile[];
 }
 
+const GET_PROFILES = gql`
+    query GetProfiles($gender: Int!, 
+        $attractedToGender: Int,
+        $minBirthdate: String, 
+        $maxBirthdate: String,
+        $minHornLength: Int, 
+        $maxHornLength: Int) {
+        profilesFilter(filter: { 
+            gender: $gender,
+            attractedToGender: $attractedToGender,
+            minBirthdate: $minBirthdate,
+            maxBirthdate: $maxBirthdate,
+            minHornlength: $minHornLength,
+            maxHornlength: $maxHornLength
+        }) {
+            id
+            profilePhoto {
+                name
+            }
+            nickname
+            birthdate
+            hornlength
+            gender
+            attractedToGender
+            description
+            lastseen
+        }
+    }
+`;
+
 function Search() {
-    const [ageRange, setAgeRange] = useState({ min: 18, max: 99 });
-    const [hornLengthRange, setHornLengthRange] = useState({ min: 10, max: 33 }); // Adjusted default min hornlength
-    const [gender, setGender] = useState(1); // Default gender filter set to 1 (assuming it's the default filter for male)
+    const [searchCriteria, setSearchCriteria] = useState({
+        ageRange: { min: 18, max: 99 },
+        hornLengthRange: { min: 10, max: 33 },
+        gender: 1,
+    });
     const [showProfiles, setShowProfiles] = useState(false);
+
+    const myGender = 1;
 
     const ageToDateString = AgeToDateUtil.ageToDate;
 
-    const handleAgeRangeChange = (min: number, max: number) => {
-        setAgeRange({ min, max });
-    };
-
-    const handleHornLengthRangeChange = (min: number, max: number) => {
-        setHornLengthRange({ min, max });
-    };
-
-    const handleGenderChange = (selectedGender: string) => {
-        setGender(parseInt(selectedGender)); // Convert selectedGender to number
-    };
-
-
-    console.log(
-        hornLengthRange
-    )
-
-    const GET_PROFILES = gql`
-        query GetProfiles($gender: Int!, 
-            $attractedToGender: Int,
-            $minBirthdate: String, 
-            $maxBirthdate: String,
-            $minHornLength: Int, 
-            $maxHornLength: Int) {
-            profilesFilter(filter: { 
-                gender: $gender,
-                attractedToGender: $attractedToGender,
-                minBirthdate: $minBirthdate,
-                maxBirthdate: $maxBirthdate,
-                minHornlength: $minHornLength,
-                maxHornlength: $maxHornLength
-            }) {
-                id
-                profilePhoto {
-                    name
-                }
-                nickname
-                birthdate
-                hornlength
-                gender
-                attractedToGender
-                description
-                lastseen
-            }
-        }
-    `;
-
-    // Use the useQuery hook with the correct types and variables
     const { loading, error, data, refetch } = useQuery<ProfilesData>(GET_PROFILES, {
         variables: {
-            gender: 1,
-            attractedToGender: gender,
-            minHornLength: hornLengthRange.min,
-            maxHornLength: hornLengthRange.max,
-         //   minBirthdate: ageToDateString(ageRange.min), // Convert age to birthday string
-          //  maxBirthdate: ageToDateString(ageRange.max), // Convert age to birthday string
+            gender: myGender,
+            attractedToGender: searchCriteria.gender,
+            minHornLength: searchCriteria.hornLengthRange.min,
+            maxHornLength: searchCriteria.hornLengthRange.max,
+            //minBirthdate: ageToDateString(searchCriteria.ageRange.min),
+            //maxBirthdate: ageToDateString(searchCriteria.ageRange.max),
         }
     });
 
-    // useEffect hook to update profiles when query data changes
     useEffect(() => {
         if (!loading && data) {
             setShowProfiles(true);
@@ -98,16 +83,20 @@ function Search() {
         }
     }, [loading, data]);
 
-    // Handle the search logic to trigger the query
-    const performSearch = () => {
-        console.log("Searching...");
+    const handleSearch = (newCriteria: {
+        ageRange: { min: number; max: number };
+        hornLengthRange: { min: number; max: number };
+        gender: number;
+    }) => {
+        console.log(newCriteria);
+        setSearchCriteria(newCriteria);
         refetch({
-            gender: 1,
-            attractedToGender: gender,
-            minHornLength: hornLengthRange.min,
-            maxHornLength: hornLengthRange.max,
-          //  minBirthdate: ageToDateString(ageRange.min), // Convert age to birthday string
-          //  maxBirthdate: ageToDateString(ageRange.max), // Convert age to birthday string
+            gender: myGender,
+            attractedToGender: newCriteria.gender,
+            minHornLength: newCriteria.hornLengthRange.min,
+            maxHornLength: newCriteria.hornLengthRange.max,
+           // minBirthdate: ageToDateString(newCriteria.ageRange.min),
+            //maxBirthdate: ageToDateString(newCriteria.ageRange.max),
         });
     };
 
@@ -115,18 +104,14 @@ function Search() {
         <Container>
             <h2>Ich suche Einhörner</h2>
             <SearchForm
-                ageRange={ageRange}
-                hornLengthRange={hornLengthRange}
-                gender={gender.toString()} // Convert gender to string for form component
-                onSearch={performSearch} // Pass performSearch function to SearchForm
-                onAgeRangeChange={handleAgeRangeChange}
-                onHornLengthRangeChange={handleHornLengthRangeChange}
-                onGenderChange={handleGenderChange}
+                initialAgeRange={searchCriteria.ageRange}
+                initialHornLengthRange={searchCriteria.hornLengthRange}
+                initialGender={searchCriteria.gender}
+                onSearch={handleSearch}
             />
 
             <Row>
                 {loading || !showProfiles ? (
-                    // Render placeholders while loading
                     Array.from({ length: 15 }).map((_, index) => (
                         <Col key={index} xs={12} sm={6} md={4} lg={3}>
                             <CardPlaceHolder />
