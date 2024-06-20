@@ -2,7 +2,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { useQuery, gql } from '@apollo/client';
 import ProfileCard from '../components/ProfileCard';
-import CardPlaceHolder from "../components/CardPlaceHolder"; 
+import CardPlaceHolder from "../components/CardPlaceHolder";
 import SearchForm from "../components/SearchForm";
 import AgeToDateUtil from "../utils/AgeToDate";
 
@@ -84,7 +84,7 @@ function Search() {
 
     useEffect(() => {
         if (!loading && data) {
-            console.log(data.profilesFilter);
+            //console.log(data.profilesFilter);
             setShowProfiles(true);
         } else {
             setShowProfiles(false);
@@ -118,7 +118,7 @@ function Search() {
                 onSearch={handleSearch}
             />
 
-            <Row>
+<Row>
                 {loading || !showProfiles ? (
                     Array.from({ length: 15 }).map((_, index) => (
                         <Col key={index} xs={12} sm={6} md={4} lg={3}>
@@ -126,11 +126,20 @@ function Search() {
                         </Col>
                     ))
                 ) : (
-                    data?.profilesFilter.map((profile) => (
-                        <Col key={profile.id} xs={12} sm={6} md={4} lg={3}>
-                            <ProfileCard profile={profile} />
+                    (data?.profilesFilter?.length ?? 0) > 0 ? (
+                        data?.profilesFilter.map((profile) => (
+                            <Col key={profile.id} xs={12} sm={6} md={4} lg={3}>
+                                <ProfileCard profile={profile} />
+                            </Col>
+                        ))
+                    ) : (
+                        <Col>
+                            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                                <h3>Keine Einhörner gefunden</h3>
+                                <p>Versuchen Sie es mit anderen Suchkriterien.</p>
+                            </div>
                         </Col>
-                    ))
+                    )
                 )}
             </Row>
         </Container>
