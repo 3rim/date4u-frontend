@@ -1,3 +1,6 @@
+body{
+    padding-bottom: 25px;
+}
 .custom-bg-primary {
     background-color: #333 !important;
 }
