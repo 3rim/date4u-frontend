@@ -183,18 +183,6 @@ function Search() {
                     ))}
                 </ButtonGroup>
             </div>
-            <div className="d-flex flex-column align-items-center mt-3">
-                <span>Pages</span>
-                <Pagination className="justify-content-center">
-                    {Array.from({ length: data?.profilesFilter?.pageInfo.totalPages ?? 0 }).map((_, index) => (
-                        <Pagination.Item key={index} active={index === currentPage} onClick={() => handlePageChange(index)}>
-                            {index + 1}
-                        </Pagination.Item>
-                    ))}
-                </Pagination>
-                <span className="text-secondary">Total matches: {data?.profilesFilter?.pageInfo.totalElements}</span>
-            </div>
-            
             <Row>
             
                 {loading || !showProfiles ? (
@@ -220,6 +208,18 @@ function Search() {
                     )
                 )}
             </Row>
+            
+            <div className="d-flex flex-column align-items-center mt-3">
+                <span>Pages</span>
+                <Pagination className="justify-content-center">
+                    {Array.from({ length: data?.profilesFilter?.pageInfo.totalPages ?? 0 }).map((_, index) => (
+                        <Pagination.Item key={index} active={index === currentPage} onClick={() => handlePageChange(index)}>
+                            {index + 1}
+                        </Pagination.Item>
+                    ))}
+                </Pagination>
+                <span className="text-secondary">Total matches: {data?.profilesFilter?.pageInfo.totalElements}</span>
+            </div>
         </Container>
     );
 }
