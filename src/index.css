@@ -1,5 +1,6 @@
 body{
     padding-bottom: 25px;
+    background-color: whitesmoke;
 }
 .custom-bg-primary {
     background-color: #333 !important;
@@ -38,4 +39,13 @@ body{
 
 .nav li:hover {
     background-color: #777;
+}
+
+.profile-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.profile-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

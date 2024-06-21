@@ -49,7 +49,7 @@ function ProfileCard({ profile }: Props) {
     };
 
     return (
-        <Card style={{ width: '18rem', margin: '1rem' }}>
+        <Card className='profile-card' style={{ width: '18rem', margin: '1rem' }}>
             {photoUrl ? (
                 <Card.Img variant="top" src={photoUrl} alt={profile.nickname} />
             ) : (

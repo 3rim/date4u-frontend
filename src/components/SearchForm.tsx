@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col } from "react-bootstrap";
+import Pagination from 'react-bootstrap/Pagination';
 
 interface SearchFormProps {
     initialAgeRange: { min: number; max: number };

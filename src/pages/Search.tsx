@@ -1,4 +1,4 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Pagination, ButtonGroup, Button } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { useQuery, gql } from '@apollo/client';
 import ProfileCard from '../components/ProfileCard';
@@ -18,18 +18,33 @@ interface Profile {
     lastseen: string;
 }
 
+interface PageInfo {
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+    totalElements: number;
+}
+
 interface ProfilesData {
-    profilesFilter: Profile[];
+    profilesFilter: {
+        content: Profile[];
+        pageInfo: PageInfo;
+    };
 }
 
 const GET_PROFILES = gql`
-    query GetProfiles($gender: Int!, 
+    query GetProfiles(
+        $page: Int!,
+        $pageSize: Int!,
+        $gender: Int!,
         $attractedToGender: Int,
-        $minBirthdate: String, 
+        $minBirthdate: String,
         $maxBirthdate: String,
-        $minHornLength: Int, 
+        $minHornLength: Int,
         $maxHornLength: Int) {
-        profilesFilter(filter: { 
+        profilesFilter(filter: {
+            page: $page,
+            pageSize: $pageSize,
             gender: $gender,
             attractedToGender: $attractedToGender,
             minBirthdate: $minBirthdate,
@@ -37,17 +52,25 @@ const GET_PROFILES = gql`
             minHornlength: $minHornLength,
             maxHornlength: $maxHornLength
         }) {
-            id
-            profilePhoto {
-                name
+            content {
+                id
+                profilePhoto {
+                    name
+                }
+                nickname
+                birthdate
+                hornlength
+                gender
+                attractedToGender
+                description
+                lastseen
             }
-            nickname
-            birthdate
-            hornlength
-            gender
-            attractedToGender
-            description
-            lastseen
+            pageInfo {
+                pageNumber
+                pageSize
+                totalPages
+                totalElements
+            }
         }
     }
 `;
@@ -59,24 +82,20 @@ function Search() {
         gender: 1,
     });
     const [showProfiles, setShowProfiles] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(5);
 
     const myGender = 1;
-
     const ageToDateString = AgeToDateUtil.ageToDate;
 
     const { loading, error, data, refetch } = useQuery<ProfilesData>(GET_PROFILES, {
         variables: {
             gender: myGender,
+            page: currentPage,
+            pageSize: pageSize,
             attractedToGender: searchCriteria.gender,
             minHornLength: searchCriteria.hornLengthRange.min,
             maxHornLength: searchCriteria.hornLengthRange.max,
-            /*
-                minBirthdate ist das frühestmögliche Geburtsdatum also ageRange.MAX
-                maxBirthdate bezieht sich das das späteste geburtsdatum.
-                minBirthDate ist das MAXIMAL Alter
-                maxBirthDate ist das MINIMAL Alter
-                ==> ageRange,MAX wird minBirthdate zugewiesen. Analog ageRange.MIN
-            */
             minBirthdate: ageToDateString(searchCriteria.ageRange.max),
             maxBirthdate: ageToDateString(searchCriteria.ageRange.min),
         }
@@ -84,7 +103,7 @@ function Search() {
 
     useEffect(() => {
         if (!loading && data) {
-            //console.log(data.profilesFilter);
+            console.log(data);
             setShowProfiles(true);
         } else {
             setShowProfiles(false);
@@ -100,11 +119,43 @@ function Search() {
         setSearchCriteria(newCriteria);
         refetch({
             gender: myGender,
+            page: 0,
+            pageSize: pageSize,
             attractedToGender: newCriteria.gender,
             minHornLength: newCriteria.hornLengthRange.min,
             maxHornLength: newCriteria.hornLengthRange.max,
             minBirthdate: ageToDateString(newCriteria.ageRange.max),
             maxBirthdate: ageToDateString(newCriteria.ageRange.min),
+        });
+        setCurrentPage(0);
+    };
+
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+        refetch({
+            gender: myGender,
+            page: pageNumber,
+            pageSize: pageSize,
+            attractedToGender: searchCriteria.gender,
+            minHornLength: searchCriteria.hornLengthRange.min,
+            maxHornLength: searchCriteria.hornLengthRange.max,
+            minBirthdate: ageToDateString(searchCriteria.ageRange.max),
+            maxBirthdate: ageToDateString(searchCriteria.ageRange.min),
+        });
+    };
+
+    const handlePageSizeChange = (newPageSize: number) => {
+        setPageSize(newPageSize);
+        setCurrentPage(0);
+        refetch({
+            gender: myGender,
+            page: 0,
+            pageSize: newPageSize,
+            attractedToGender: searchCriteria.gender,
+            minHornLength: searchCriteria.hornLengthRange.min,
+            maxHornLength: searchCriteria.hornLengthRange.max,
+            minBirthdate: ageToDateString(searchCriteria.ageRange.max),
+            maxBirthdate: ageToDateString(searchCriteria.ageRange.min),
         });
     };
 
@@ -117,17 +168,44 @@ function Search() {
                 initialGender={searchCriteria.gender}
                 onSearch={handleSearch}
             />
-
-<Row>
+           <div className="d-flex flex-column align-items-center m-3">
+                <span>Pagesize</span>
+                <ButtonGroup aria-label="Page size">
+                    {[5, 10, 15].map(size => (
+                        <Button 
+                            key={size}
+                            variant="primary" 
+                            active={pageSize === size} 
+                            onClick={() => handlePageSizeChange(size)}
+                        >
+                            {size}
+                        </Button>
+                    ))}
+                </ButtonGroup>
+            </div>
+            <div className="d-flex flex-column align-items-center mt-3">
+                <span>Pages</span>
+                <Pagination className="justify-content-center">
+                    {Array.from({ length: data?.profilesFilter?.pageInfo.totalPages ?? 0 }).map((_, index) => (
+                        <Pagination.Item key={index} active={index === currentPage} onClick={() => handlePageChange(index)}>
+                            {index + 1}
+                        </Pagination.Item>
+                    ))}
+                </Pagination>
+                <span className="text-secondary">Total matches: {data?.profilesFilter?.pageInfo.totalElements}</span>
+            </div>
+            
+            <Row>
+            
                 {loading || !showProfiles ? (
-                    Array.from({ length: 15 }).map((_, index) => (
+                    Array.from({ length: pageSize }).map((_, index) => (
                         <Col key={index} xs={12} sm={6} md={4} lg={3}>
                             <CardPlaceHolder />
                         </Col>
                     ))
                 ) : (
-                    (data?.profilesFilter?.length ?? 0) > 0 ? (
-                        data?.profilesFilter.map((profile) => (
+                    (data?.profilesFilter?.content.length ?? 0) > 0 ? (
+                        data?.profilesFilter.content.map((profile) => (
                             <Col key={profile.id} xs={12} sm={6} md={4} lg={3}>
                                 <ProfileCard profile={profile} />
                             </Col>
